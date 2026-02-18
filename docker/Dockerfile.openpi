@@ -1,0 +1,56 @@
+# Use Ubuntu 24.04 (Noble) for ROS 2 Jazzy
+FROM ubuntu:24.04
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV ROS_DISTRO=jazzy
+
+# 1. Install Basic Tools & ROS 2 Jazzy Key/Repo
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg2 \
+    lsb-release \
+    python3-pip \
+    python3-venv \
+    git \
+    && curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
+
+# 2. Install ROS 2 Jazzy (Base or Desktop)
+RUN apt-get update && apt-get install -y \
+    ros-jazzy-ros-base \
+    python3-colcon-common-extensions \
+    ros-jazzy-cv-bridge \
+    ros-jazzy-sensor-msgs \
+    && rm -rf /var/lib/apt/lists/*
+
+# 3. Setup Python Environment for OpenPI
+# We use a virtual env to avoid breaking system-level ROS 2 paths
+RUN python3 -m venv /opt/openpi_venv
+ENV PATH="/opt/openpi_venv/bin:$PATH"
+
+# Install OpenPI and its typical ML stack
+# Adjust 'openpi' to the specific repo/package name you are using
+RUN pip3 install --upgrade pip && \
+    pip3 install uv && \
+    pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124 && \
+    pip3 install numpy opencv-python pyzmq pytest chex
+
+# Clone and install OpenPI repository using uv for better dependency resolution
+RUN git clone https://github.com/Physical-Intelligence/openpi.git /opt/openpi
+RUN . /opt/openpi_venv/bin/activate && \
+    cd /opt/openpi && \
+    git submodule update --init --recursive && \
+    uv pip install -e .
+
+# Fix ml_collections regex warning
+RUN sed -i 's|re.match("(.*)\\\[|re.match(r"(.*)\\\[|' /opt/openpi_venv/lib/python3.12/site-packages/ml_collections/config_dict/config_dict.py
+
+# 4. Final Environment Setup
+WORKDIR /app
+RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc
+
+COPY . manipulation-isaacsim/
+
+# Default command
+CMD ["/bin/bash"]

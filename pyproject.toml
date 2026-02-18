@@ -1,0 +1,27 @@
+[project]
+name = "manipulation-isaacsim"
+version = "0.1"
+requires-python = ">=3.10"
+dependencies = [
+    "requests",
+    "torch==2.5.1",
+    "torchvision==0.20.1",
+#    "isaacsim[all,extscache]==4.5.0"
+]
+
+[build-system]
+requires = ["setuptools>=64.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"manipulation_isaacsim.config" = ["*.yaml"]
+"manipulation_isaacsim.robots" = ["*"]
+
+[project.scripts]
+run-sim = "manipulation_isaacsim.__main__:main"
