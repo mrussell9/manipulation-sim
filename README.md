@@ -71,10 +71,9 @@ gsutil -m cp -r gs://openpi-assets/checkpoints/pi0_base \
     src/manipulation_isaacsim/agent/checkpoints/
 
 # Download the PaliGemma tokenizer 
-mkdir -p src/manipulation_isaacsim/agent/tokenizers
-# The tokenizer is automatically downloaded by openpi when needed,
-# but it's referenced locally in the code from:
-# src/manipulation_isaacsim/agent/tokenizers/paligemma_tokenizer.model
+mkdir -p src/manipulation_isaacsim/agent/tokenizers/
+curl -L -o src/manipulation_isaacsim/agent/tokenizers/paligemma_tokenizer.model \
+https://storage.googleapis.com/big_vision/paligemma_tokenizer.model
 ```
 
 **Note**: 
@@ -84,7 +83,7 @@ mkdir -p src/manipulation_isaacsim/agent/tokenizers
 
 ### 4. Ensure Isaac Sim is installed
 
-Make sure NVIDIA Isaac Sim 4.5.0 is properly installed and configured on your system.
+Make sure NVIDIA Isaac Sim 5.1.0 is properly installed and configured on your system.
 
 ## Usage
 

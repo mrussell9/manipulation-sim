@@ -47,7 +47,7 @@ RUN apt-get update && apt-get install -y \
 
 # Use Isaac Python installation, ensure pip uses that installation
 ENV ISAAC_PATH=/isaac-sim
-ENV MAN_ISAAC_SIM_PATH=/manipulation-isaacsim
+ENV MAN_ISAAC_SIM_PATH=/manipulation-sim
 ENV CARB_APP_PATH=${ISAAC_PATH}/kit
 ENV EXP_PATH=${ISAAC_PATH}/apps
 ENV MAN_ISAAC_SIM_PYTHON=${MAN_ISAAC_SIM_PATH}/docker/isaac_python_docker_setup.sh
@@ -55,8 +55,8 @@ ENV MAN_ISAAC_SIM_PYTHON=${MAN_ISAAC_SIM_PATH}/docker/isaac_python_docker_setup.
 # RUN echo 'export PYTHONPATH=${ISAAC_SIM_ROOT}/kit/python/bin:${PYTHONPATH}' >> /root/.bashrc
 RUN echo 'source /opt/ros/jazzy/setup.bash' >> /root/.bashrc
 
-# Copy over manipulation-isaacsim to pull in python script
-COPY . /manipulation-isaacsim
+# Copy over manipulation-sim to pull in python script
+COPY . /manipulation-sim
 RUN ln -sf ${MAN_ISAAC_SIM_PYTHON} /usr/bin/python3
 RUN ln -sf ${MAN_ISAAC_SIM_PYTHON} /usr/bin/python
 RUN pip install -U \
@@ -65,7 +65,7 @@ RUN pip install -U \
     netifaces \
     wheel \
     opencv-python --no-deps
-RUN cd /manipulation-isaacsim && pip install -e .
+RUN cd /manipulation-sim && pip install -e .
 
 # Patch shebangs (TODO: dehack)
 RUN find /isaac-sim/kit/python/bin -type f -exec grep -l "isaac-sim/kit/python/bin/python3" {} \; | xargs -r sed -i '1s|#!/isaac-sim/kit/python/bin/python3|#!/usr/bin/env python3|'
@@ -87,12 +87,12 @@ RUN git clone https://github.com/Physical-Intelligence/openpi.git /opt/openpi &&
     uv pip install -e . --system
 
 # Build the ROS workspace
-WORKDIR /manipulation-isaacsim/src/manipulation_isaacsim/ros_ws
+WORKDIR /manipulation-sim/src/manipulation_isaacsim/ros_ws
 
 RUN /bin/bash -c ". /opt/ros/jazzy/setup.bash && colcon build"
 
 # Add the workspace setup to bashrc so it's sourced in new shells
-RUN echo 'source /manipulation-isaacsim/src/manipulation_isaacsim/ros_ws/install/setup.bash' >> /root/.bashrc
+RUN echo 'source /manipulation-sim/src/manipulation_isaacsim/ros_ws/install/setup.bash' >> /root/.bashrc
 
 WORKDIR /
 # Set the entrypoint
