@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python packaging
+*.egg-info/
+dist/
+build/
+
+# ROS2 workspace artifacts
+src/manipulation_isaacsim/ros_ws/build/
+src/manipulation_isaacsim/ros_ws/install/
+src/manipulation_isaacsim/ros_ws/log/
+
+# Agent folder (models, checkpoints, tokenizers)
+src/manipulation_isaacsim/agent/checkpoints/*
+src/manipulation_isaacsim/agent/tokenizers/*
+
+# Isaac Sim / Omniverse
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
